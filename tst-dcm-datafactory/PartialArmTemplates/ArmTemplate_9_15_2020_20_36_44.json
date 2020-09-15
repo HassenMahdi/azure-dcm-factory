@@ -1,0 +1,335 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "tst-dcm-datafactory"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/MongoToSQL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy To Staging Table",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Set Staging Table Name",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "CosmosDbMongoDbApiSource",
+								"batchSize": 100,
+								"filter": {
+									"value": "@variables('cosmos_filter')",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"tableOption": "autoCreate",
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "tst_mdb_domain_data_collection",
+								"type": "DatasetReference",
+								"parameters": {
+									"domain_id": {
+										"value": "@variables('domain_id')",
+										"type": "Expression"
+									}
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "tst_sql_domain_data_collection",
+								"type": "DatasetReference",
+								"parameters": {
+									"domain_id": {
+										"value": "@variables('domain_id')",
+										"type": "Expression"
+									},
+									"table_name": {
+										"value": "@variables('staging_table_name')",
+										"type": "Expression"
+									}
+								}
+							}
+						]
+					},
+					{
+						"name": "Set Domain ID",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "domain_id",
+							"value": {
+								"value": "@split(pipeline().parameters.input, '.')[0]",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Set Flow ID",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "Set Domain ID",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "flow_id",
+							"value": {
+								"value": "@split(pipeline().parameters.input, '.')[1]",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Set Cosmos Filter",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "Set Flow ID",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "cosmos_filter",
+							"value": {
+								"value": "{'flow_id': \"@{variables('flow_id')}\"}",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Merge Staging Table",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "Copy To Staging Table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[SP_MERGE_COLLECTION_DATA]",
+							"storedProcedureParameters": {
+								"sourceSchema": {
+									"value": {
+										"value": "@variables('domain_id')",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"sourceTable": {
+									"value": {
+										"value": "@variables('staging_table_name')",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"targetSchema": {
+									"value": {
+										"value": "@variables('domain_id')",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"targetTable": {
+									"value": "collection_data",
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "LS_TST_SQL",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Set Staging Table Name",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "Set Cosmos Filter",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "staging_table_name",
+							"value": {
+								"value": "staging_@{variables('flow_id')}",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"parameters": {
+					"input": {
+						"type": "string",
+						"defaultValue": "d.f"
+					}
+				},
+				"variables": {
+					"domain_id": {
+						"type": "String"
+					},
+					"flow_id": {
+						"type": "String"
+					},
+					"cosmos_filter": {
+						"type": "String"
+					},
+					"staging_table_name": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"lastPublishTime": "2020-09-07T18:48:58Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/tst_mdb_domain_data_collection')]",
+				"[concat(variables('factoryId'), '/datasets/tst_sql_domain_data_collection')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/tst_mdb_domain_data_collection')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "tst dcm cosmos db",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"domain_id": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "CosmosDbMongoDbApiCollection",
+				"schema": [],
+				"typeProperties": {
+					"collection": {
+						"value": "@{dataset().domain_id}.collection_data",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/tst_sql_domain_data_collection')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_TST_SQL",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"domain_id": {
+						"type": "string"
+					},
+					"table_name": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().domain_id",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().table_name",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Begin SQL Injection')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [
+					"OnCollectionDataImported"
+				],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "MongoToSQL",
+							"type": "PipelineReference"
+						},
+						"parameters": {
+							"input": "@triggerBody().fileName"
+						}
+					}
+				],
+				"type": "BlobEventsTrigger",
+				"typeProperties": {
+					"blobPathBeginsWith": "/tst-upload-tigger/blobs/",
+					"ignoreEmptyBlobs": false,
+					"scope": "/subscriptions/b5bfc7e0-0306-4f8a-aacc-cefe8ebd78e8/resourceGroups/Datacapture/providers/Microsoft.Storage/storageAccounts/devdcmstorage",
+					"events": [
+						"Microsoft.Storage.BlobCreated"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/MongoToSQL')]"
+			]
+		}
+	]
+}

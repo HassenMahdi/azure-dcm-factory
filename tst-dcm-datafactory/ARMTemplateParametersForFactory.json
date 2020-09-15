@@ -1,0 +1,36 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "tst-dcm-datafactory"
+		},
+		"LS_TST_SQL_connectionString": {
+			"value": ""
+		},
+		"dcm cosmos db_connectionString": {
+			"value": ""
+		},
+		"linkedService1_connectionString": {
+			"value": ""
+		},
+		"sql data collection_connectionString": {
+			"value": ""
+		},
+		"tst dcm cosmos db_connectionString": {
+			"value": ""
+		},
+		"dcm cosmos db_properties_typeProperties_database": {
+			"value": "dcm"
+		},
+		"tst dcm cosmos db_properties_typeProperties_database": {
+			"value": "dcm"
+		},
+		"Begin SQL Injection_properties_MongoToSQL_parameters_input": {
+			"value": "@triggerBody().fileName"
+		},
+		"Begin SQL Injection_properties_typeProperties_scope": {
+			"value": "/subscriptions/b5bfc7e0-0306-4f8a-aacc-cefe8ebd78e8/resourceGroups/Datacapture/providers/Microsoft.Storage/storageAccounts/devdcmstorage"
+		}
+	}
+}
