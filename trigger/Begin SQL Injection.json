@@ -1,0 +1,29 @@
+{
+	"name": "Begin SQL Injection",
+	"properties": {
+		"annotations": [
+			"OnCollectionDataImported"
+		],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "MongoToSQL",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"input": "@triggerBody().fileName"
+				}
+			}
+		],
+		"type": "BlobEventsTrigger",
+		"typeProperties": {
+			"blobPathBeginsWith": "/upload-tigger/blobs/",
+			"ignoreEmptyBlobs": false,
+			"scope": "/subscriptions/b5bfc7e0-0306-4f8a-aacc-cefe8ebd78e8/resourceGroups/Datacapture/providers/Microsoft.Storage/storageAccounts/devdcmstorage",
+			"events": [
+				"Microsoft.Storage.BlobCreated"
+			]
+		}
+	}
+}

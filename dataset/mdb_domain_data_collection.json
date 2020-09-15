@@ -1,0 +1,24 @@
+{
+	"name": "mdb_domain_data_collection",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "dcm cosmos db",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"domain_id": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "CosmosDbMongoDbApiCollection",
+		"schema": [],
+		"typeProperties": {
+			"collection": {
+				"value": "@{dataset().domain_id}.collection_data",
+				"type": "Expression"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
