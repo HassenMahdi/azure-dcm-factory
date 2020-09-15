@@ -40,13 +40,29 @@
 				"inputs": [
 					{
 						"referenceName": "tst_mdb_domain_data_collection",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"domain_id": {
+								"value": "@variables('domain_id')",
+								"type": "Expression"
+							}
+						}
 					}
 				],
 				"outputs": [
 					{
 						"referenceName": "tst_sql_domain_data_collection",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"domain_id": {
+								"value": "@variables('domain_id')",
+								"type": "Expression"
+							},
+							"table_name": {
+								"value": "@variables('staging_table_name')",
+								"type": "Expression"
+							}
+						}
 					}
 				]
 			},
