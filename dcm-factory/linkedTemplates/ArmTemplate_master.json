@@ -1,0 +1,84 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "dcm-factory"
+		},
+		"dcm cosmos db_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'dcm cosmos db'"
+		},
+		"linkedService1_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'linkedService1'"
+		},
+		"sql data collection_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'sql data collection'"
+		},
+		"dcm cosmos db_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "dcm"
+		},
+		"Begin SQL Injection_properties_MongoToSQL_parameters_input": {
+			"type": "string",
+			"defaultValue": "@triggerBody().fileName"
+		},
+		"Begin SQL Injection_properties_typeProperties_scope": {
+			"type": "string",
+			"defaultValue": "/subscriptions/b5bfc7e0-0306-4f8a-aacc-cefe8ebd78e8/resourceGroups/Datacapture/providers/Microsoft.Storage/storageAccounts/devdcmstorage"
+		},
+		"containerUri": {
+			"type": "string",
+			"metadata": "URI to storage account containing linked ARM templates"
+		},
+		"containerSasToken": {
+			"type": "string",
+			"metadata": "Sas token to storage account containing linked ARM templates"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "dcm-factory_ArmTemplate_0",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_0.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"dcm cosmos db_connectionString": {
+						"value": "[parameters('dcm cosmos db_connectionString')]"
+					},
+					"linkedService1_connectionString": {
+						"value": "[parameters('linkedService1_connectionString')]"
+					},
+					"sql data collection_connectionString": {
+						"value": "[parameters('sql data collection_connectionString')]"
+					},
+					"dcm cosmos db_properties_typeProperties_database": {
+						"value": "[parameters('dcm cosmos db_properties_typeProperties_database')]"
+					},
+					"Begin SQL Injection_properties_MongoToSQL_parameters_input": {
+						"value": "[parameters('Begin SQL Injection_properties_MongoToSQL_parameters_input')]"
+					},
+					"Begin SQL Injection_properties_typeProperties_scope": {
+						"value": "[parameters('Begin SQL Injection_properties_typeProperties_scope')]"
+					}
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}
