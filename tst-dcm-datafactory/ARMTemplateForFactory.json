@@ -490,7 +490,7 @@
 				],
 				"type": "BlobEventsTrigger",
 				"typeProperties": {
-					"blobPathBeginsWith": "/tst-upload-tigger/blobs/",
+					"blobPathBeginsWith": "/tst-upload-trigger/blobs/",
 					"ignoreEmptyBlobs": false,
 					"scope": "[parameters('Begin SQL Injection_properties_typeProperties_scope')]",
 					"events": [
