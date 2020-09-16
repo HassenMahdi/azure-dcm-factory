@@ -2,7 +2,7 @@
 	"name": "mdb_domain_data_collection",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "dcm cosmos db",
+			"referenceName": "LS_DCM_MONGO",
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
