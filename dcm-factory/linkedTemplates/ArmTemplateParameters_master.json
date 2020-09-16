@@ -11,7 +11,7 @@
 		"linkedService1_connectionString": {
 			"value": ""
 		},
-		"sql data collection_connectionString": {
+		"LS_DCM_MONGO_connectionString": {
 			"value": ""
 		},
 		"dcm cosmos db_properties_typeProperties_database": {
@@ -22,6 +22,12 @@
 		},
 		"Begin SQL Injection_properties_typeProperties_scope": {
 			"value": "/subscriptions/b5bfc7e0-0306-4f8a-aacc-cefe8ebd78e8/resourceGroups/Datacapture/providers/Microsoft.Storage/storageAccounts/devdcmstorage"
+		},
+		"dcm key vault_properties_typeProperties_baseUrl": {
+			"value": "https://dcm-keys.vault.azure.net/"
+		},
+		"LS_DCM_MONGO_properties_typeProperties_database": {
+			"value": "dcm"
 		},
 		"containerUri": {
 			"value": ""

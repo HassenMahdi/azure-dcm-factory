@@ -15,9 +15,9 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'linkedService1'"
 		},
-		"sql data collection_connectionString": {
+		"LS_DCM_MONGO_connectionString": {
 			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'sql data collection'"
+			"metadata": "Secure string for 'connectionString' of 'LS_DCM_MONGO'"
 		},
 		"dcm cosmos db_properties_typeProperties_database": {
 			"type": "string",
@@ -30,6 +30,14 @@
 		"Begin SQL Injection_properties_typeProperties_scope": {
 			"type": "string",
 			"defaultValue": "/subscriptions/b5bfc7e0-0306-4f8a-aacc-cefe8ebd78e8/resourceGroups/Datacapture/providers/Microsoft.Storage/storageAccounts/devdcmstorage"
+		},
+		"dcm key vault_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://dcm-keys.vault.azure.net/"
+		},
+		"LS_DCM_MONGO_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "dcm"
 		},
 		"containerUri": {
 			"type": "string",
@@ -64,11 +72,17 @@
 					"linkedService1_connectionString": {
 						"value": "[parameters('linkedService1_connectionString')]"
 					},
-					"sql data collection_connectionString": {
-						"value": "[parameters('sql data collection_connectionString')]"
+					"LS_DCM_MONGO_connectionString": {
+						"value": "[parameters('LS_DCM_MONGO_connectionString')]"
 					},
 					"dcm cosmos db_properties_typeProperties_database": {
 						"value": "[parameters('dcm cosmos db_properties_typeProperties_database')]"
+					},
+					"dcm key vault_properties_typeProperties_baseUrl": {
+						"value": "[parameters('dcm key vault_properties_typeProperties_baseUrl')]"
+					},
+					"LS_DCM_MONGO_properties_typeProperties_database": {
+						"value": "[parameters('LS_DCM_MONGO_properties_typeProperties_database')]"
 					},
 					"Begin SQL Injection_properties_MongoToSQL_parameters_input": {
 						"value": "[parameters('Begin SQL Injection_properties_MongoToSQL_parameters_input')]"
