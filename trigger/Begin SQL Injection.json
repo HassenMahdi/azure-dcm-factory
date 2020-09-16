@@ -18,7 +18,7 @@
 		],
 		"type": "BlobEventsTrigger",
 		"typeProperties": {
-			"blobPathBeginsWith": "/tst-upload-tigger/blobs/",
+			"blobPathBeginsWith": "/tst-upload-trigger/blobs/",
 			"ignoreEmptyBlobs": false,
 			"scope": "/subscriptions/b5bfc7e0-0306-4f8a-aacc-cefe8ebd78e8/resourceGroups/Datacapture/providers/Microsoft.Storage/storageAccounts/devdcmstorage",
 			"events": [
