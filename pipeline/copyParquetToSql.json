@@ -1,5 +1,5 @@
 {
-	"name": "copyParqetToSql",
+	"name": "copyParquetToSql",
 	"properties": {
 		"activities": [
 			{
@@ -74,7 +74,7 @@
 				"typeProperties": {
 					"variableName": "domain_id",
 					"value": {
-						"value": "@split(pipeline().parameters.input, '.')[0]",
+						"value": "@split(pipeline().parameters.blob_name, '.')[0]",
 						"type": "Expression"
 					}
 				}
@@ -94,7 +94,7 @@
 				"typeProperties": {
 					"variableName": "flow_id",
 					"value": {
-						"value": "@split(pipeline().parameters.input, '.')[1]",
+						"value": "@split(pipeline().parameters.blob_name, '.')[1]",
 						"type": "Expression"
 					}
 				}
