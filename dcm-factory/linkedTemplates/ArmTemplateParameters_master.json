@@ -5,29 +5,29 @@
 		"factoryName": {
 			"value": "dcm-factory"
 		},
+		"AzureDataLakeStorage1_accountKey": {
+			"value": ""
+		},
+		"LS_DCM_MONGO_connectionString": {
+			"value": ""
+		},
 		"dcm cosmos db_connectionString": {
 			"value": ""
 		},
 		"linkedService1_connectionString": {
 			"value": ""
 		},
-		"LS_DCM_MONGO_connectionString": {
-			"value": ""
+		"AzureDataLakeStorage1_properties_typeProperties_url": {
+			"value": "https://devdcmstorage.dfs.core.windows.net"
+		},
+		"LS_DCM_MONGO_properties_typeProperties_database": {
+			"value": "dcm"
 		},
 		"dcm cosmos db_properties_typeProperties_database": {
 			"value": "dcm"
 		},
-		"Begin SQL Injection_properties_MongoToSQL_parameters_input": {
-			"value": "@triggerBody().fileName"
-		},
 		"Begin SQL Injection_properties_typeProperties_scope": {
 			"value": "/subscriptions/b5bfc7e0-0306-4f8a-aacc-cefe8ebd78e8/resourceGroups/Datacapture/providers/Microsoft.Storage/storageAccounts/devdcmstorage"
-		},
-		"dcm key vault_properties_typeProperties_baseUrl": {
-			"value": "https://dcm-keys.vault.azure.net/"
-		},
-		"LS_DCM_MONGO_properties_typeProperties_database": {
-			"value": "dcm"
 		},
 		"containerUri": {
 			"value": ""

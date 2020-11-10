@@ -7,6 +7,14 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "dcm-factory"
 		},
+		"AzureDataLakeStorage1_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'AzureDataLakeStorage1'"
+		},
+		"LS_DCM_MONGO_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'LS_DCM_MONGO'"
+		},
 		"dcm cosmos db_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'dcm cosmos db'"
@@ -15,29 +23,21 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'linkedService1'"
 		},
-		"LS_DCM_MONGO_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'LS_DCM_MONGO'"
+		"AzureDataLakeStorage1_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://devdcmstorage.dfs.core.windows.net"
+		},
+		"LS_DCM_MONGO_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "dcm"
 		},
 		"dcm cosmos db_properties_typeProperties_database": {
 			"type": "string",
 			"defaultValue": "dcm"
 		},
-		"Begin SQL Injection_properties_MongoToSQL_parameters_input": {
-			"type": "string",
-			"defaultValue": "@triggerBody().fileName"
-		},
 		"Begin SQL Injection_properties_typeProperties_scope": {
 			"type": "string",
 			"defaultValue": "/subscriptions/b5bfc7e0-0306-4f8a-aacc-cefe8ebd78e8/resourceGroups/Datacapture/providers/Microsoft.Storage/storageAccounts/devdcmstorage"
-		},
-		"dcm key vault_properties_typeProperties_baseUrl": {
-			"type": "string",
-			"defaultValue": "https://dcm-keys.vault.azure.net/"
-		},
-		"LS_DCM_MONGO_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "dcm"
 		}
 	},
 	"variables": {
@@ -45,7 +45,7 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/MongoToSQL')]",
+			"name": "[concat(parameters('factoryName'), '/copyParquetToSql')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -122,7 +122,7 @@
 						"typeProperties": {
 							"variableName": "domain_id",
 							"value": {
-								"value": "@split(pipeline().parameters.input, '.')[0]",
+								"value": "@split(pipeline().parameters.blob_name, '.')[0]",
 								"type": "Expression"
 							}
 						}
@@ -142,7 +142,7 @@
 						"typeProperties": {
 							"variableName": "flow_id",
 							"value": {
-								"value": "@split(pipeline().parameters.input, '.')[1]",
+								"value": "@split(pipeline().parameters.blob_name, '.')[1]",
 								"type": "Expression"
 							}
 						}
@@ -240,24 +240,12 @@
 								"type": "Expression"
 							}
 						}
-					},
-					{
-						"name": "If Condition1",
-						"type": "IfCondition",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"expression": {
-								"value": "true\n",
-								"type": "Expression"
-							}
-						}
 					}
 				],
 				"parameters": {
-					"input": {
+					"blob_name": {
 						"type": "string",
-						"defaultValue": "d.f"
+						"defaultValue": "NOT SET"
 					}
 				},
 				"variables": {
@@ -347,6 +335,37 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/AzureDataLakeStorage1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('AzureDataLakeStorage1_accountKey')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_DCM_MONGO')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "CosmosDbMongoDbApi",
+				"typeProperties": {
+					"connectionString": "[parameters('LS_DCM_MONGO_connectionString')]",
+					"database": "[parameters('LS_DCM_MONGO_properties_typeProperties_database')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/dcm cosmos db')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -381,18 +400,8 @@
 				"annotations": [
 					"OnCollectionDataImported"
 				],
-				"runtimeState": "Started",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "MongoToSQL",
-							"type": "PipelineReference"
-						},
-						"parameters": {
-							"input": "[parameters('Begin SQL Injection_properties_MongoToSQL_parameters_input')]"
-						}
-					}
-				],
+				"runtimeState": "Stopped",
+				"pipelines": [],
 				"type": "BlobEventsTrigger",
 				"typeProperties": {
 					"blobPathBeginsWith": "/upload-tigger/blobs/",
@@ -401,35 +410,6 @@
 					"events": [
 						"Microsoft.Storage.BlobCreated"
 					]
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/MongoToSQL')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/dcm key vault')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureKeyVault",
-				"typeProperties": {
-					"baseUrl": "[parameters('dcm key vault_properties_typeProperties_baseUrl')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_DCM_MONGO')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "CosmosDbMongoDbApi",
-				"typeProperties": {
-					"connectionString": "[parameters('LS_DCM_MONGO_connectionString')]",
-					"database": "[parameters('LS_DCM_MONGO_properties_typeProperties_database')]"
 				}
 			},
 			"dependsOn": []
