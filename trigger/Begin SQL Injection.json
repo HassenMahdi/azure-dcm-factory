@@ -4,7 +4,7 @@
 		"annotations": [
 			"OnCollectionDataImported"
 		],
-		"runtimeState": "Started",
+		"runtimeState": "Stopped",
 		"pipelines": [],
 		"type": "BlobEventsTrigger",
 		"typeProperties": {
