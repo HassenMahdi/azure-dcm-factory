@@ -5,17 +5,7 @@
 			"OnCollectionDataImported"
 		],
 		"runtimeState": "Started",
-		"pipelines": [
-			{
-				"pipelineReference": {
-					"referenceName": "copyParqetToSql",
-					"type": "PipelineReference"
-				},
-				"parameters": {
-					"input": "@triggerBody().fileName"
-				}
-			}
-		],
+		"pipelines": [],
 		"type": "BlobEventsTrigger",
 		"typeProperties": {
 			"blobPathBeginsWith": "/upload-tigger/blobs/",
