@@ -1,5 +1,5 @@
 {
-	"name": "MongoToSQL",
+	"name": "copyParqetToSql",
 	"properties": {
 		"activities": [
 			{

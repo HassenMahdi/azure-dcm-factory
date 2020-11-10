@@ -8,7 +8,7 @@
 		"pipelines": [
 			{
 				"pipelineReference": {
-					"referenceName": "MongoToSQL",
+					"referenceName": "copyParqetToSql",
 					"type": "PipelineReference"
 				},
 				"parameters": {
