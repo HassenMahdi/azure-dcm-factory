@@ -23,6 +23,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'linkedService1'"
 		},
+		"DCMAzureBlobStorage_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'DCMAzureBlobStorage'"
+		},
 		"AzureDataLakeStorage1_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://devdcmstorage.dfs.core.windows.net"
@@ -71,11 +75,14 @@
 						"userProperties": [],
 						"typeProperties": {
 							"source": {
-								"type": "CosmosDbMongoDbApiSource",
-								"batchSize": 100,
-								"filter": {
-									"value": "@variables('cosmos_filter')",
-									"type": "Expression"
+								"type": "ParquetSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"wildcardFileName": {
+										"value": "@pipeline().parameters.blob_name",
+										"type": "Expression"
+									}
 								}
 							},
 							"sink": {
@@ -87,14 +94,9 @@
 						},
 						"inputs": [
 							{
-								"referenceName": "mdb_domain_data_collection",
+								"referenceName": "LS_parquet_lake",
 								"type": "DatasetReference",
-								"parameters": {
-									"domain_id": {
-										"value": "@variables('domain_id')",
-										"type": "Expression"
-									}
-								}
+								"parameters": {}
 							}
 						],
 						"outputs": [
@@ -266,7 +268,7 @@
 				"lastPublishTime": "2020-09-07T18:48:58Z"
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/mdb_domain_data_collection')]",
+				"[concat(variables('factoryId'), '/datasets/LS_parquet_lake')]",
 				"[concat(variables('factoryId'), '/datasets/sql_domain_data_collection')]",
 				"[concat(variables('factoryId'), '/linkedServices/linkedService1')]"
 			]
@@ -413,6 +415,43 @@
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DCMAzureBlobStorage')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('DCMAzureBlobStorage_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_parquet_lake')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "DCMAzureBlobStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"container": "uploads"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/DCMAzureBlobStorage')]"
+			]
 		}
 	]
 }
