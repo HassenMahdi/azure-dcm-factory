@@ -1,0 +1,19 @@
+{
+	"name": "LS_parquet_lake",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "DCMAzureBlobStorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"container": "uploads"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}

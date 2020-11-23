@@ -23,11 +23,14 @@
 				"userProperties": [],
 				"typeProperties": {
 					"source": {
-						"type": "CosmosDbMongoDbApiSource",
-						"batchSize": 100,
-						"filter": {
-							"value": "@variables('cosmos_filter')",
-							"type": "Expression"
+						"type": "ParquetSource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"recursive": true,
+							"wildcardFileName": {
+								"value": "@pipeline().parameters.blob_name",
+								"type": "Expression"
+							}
 						}
 					},
 					"sink": {
@@ -39,14 +42,8 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "mdb_domain_data_collection",
-						"type": "DatasetReference",
-						"parameters": {
-							"domain_id": {
-								"value": "@variables('domain_id')",
-								"type": "Expression"
-							}
-						}
+						"referenceName": "LS_parquet_lake",
+						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
